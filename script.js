@@ -29,7 +29,7 @@ elements.generateBtn.addEventListener('click', async () => {
     const totalAmount = parseFloat(elements.amount.value) * parseInt(elements.quantity.value);
     
     const payload = {
-      amount: Math.round(totalAmount * 100), // Convert to centavos for API
+      amount: Math.round(totalAmount * 1), // Convert to centavos for API
       end_datetime: elements.expiry.value,
       custom_fields: {
         invoice: elements.invoice.value
