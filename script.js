@@ -1,6 +1,6 @@
-
 function labClaudioApp() {
   return {
+    token: '',
     referenciaId: '',
     novaReferencia: {
       id: '',
@@ -10,32 +10,54 @@ function labClaudioApp() {
     },
     mensagemReferencia: '',
     pagamentos: [],
+    
     gerarReferenciaId() {
-      // Mock: gerar número aleatório
-      this.referenciaId = Math.floor(Math.random() * 1e9);
+      this.referenciaId = Math.floor(Math.random() * 1e9).toString();
+      this.novaReferencia.id = this.referenciaId;
     },
-    criarReferencia() {
-      if (!this.novaReferencia.id || !this.novaReferencia.amount) {
-        this.mensagemReferencia = "Preencha todos os campos!";
+    
+    async criarReferencia() {
+      if (!this.token) {
+        alert("Insira o token primeiro.");
         return;
       }
-      this.mensagemReferencia = `✅ Referência ${this.novaReferencia.id} criada com sucesso!`;
+      try {
+        const res = await fetch('https://api.proxypay.co.ao/rps/v2/references', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${this.token}`
+          },
+          body: JSON.stringify(this.novaReferencia)
+        });
+        
+        if (!res.ok) throw new Error(await res.text());
+        
+        const data = await res.json();
+        this.mensagemReferencia = `✅ Referência ${data.id} criada com sucesso!`;
+      } catch (err) {
+        this.mensagemReferencia = `Erro: ${err.message}`;
+      }
     },
-    verPagamentos() {
-      this.pagamentos = [
-        {
-          id: 1,
-          reference_id: 123456789,
-          amount: "500.00",
-          datetime: "2025-05-06T10:00:00"
-        },
-        {
-          id: 2,
-          reference_id: 987654321,
-          amount: "750.50",
-          datetime: "2025-05-05T15:30:00"
-        }
-      ];
+    
+    async verPagamentos() {
+      if (!this.token) {
+        alert("Insira o token primeiro.");
+        return;
+      }
+      try {
+        const res = await fetch('https://api.proxypay.co.ao/rps/v2/payments', {
+          headers: {
+            'Authorization': `Token ${this.token}`
+          }
+        });
+        
+        if (!res.ok) throw new Error(await res.text());
+        
+        this.pagamentos = await res.json();
+      } catch (err) {
+        alert(`Erro ao buscar pagamentos: ${err.message}`);
+      }
     }
   };
 }

@@ -16,6 +16,11 @@
 
   <main class="p-6 space-y-6" x-data="labClaudioApp()">
     <section class="bg-white bg-opacity-10 p-6 rounded-lg shadow-md">
+      <h2 class="text-xl mb-4 font-semibold">🔐 Token de Acesso</h2>
+      <input x-model="token" class="input" placeholder="Cole seu Token aqui" />
+    </section>
+
+    <section class="bg-white bg-opacity-10 p-6 rounded-lg shadow-md">
       <h2 class="text-xl mb-4 font-semibold">🎯 Gerar ID de Referência</h2>
       <button @click="gerarReferenciaId" class="botao">Gerar</button>
       <p x-show="referenciaId" class="mensagem-sucesso mt-4">ID Gerado: <strong x-text="referenciaId"></strong></p>
