@@ -1,63 +1,112 @@
-function labClaudioApp() {
-  return {
-    token: '',
-    referenciaId: '',
-    novaReferencia: {
-      id: '',
-      amount: '',
-      end_datetime: '',
-      invoice: ''
-    },
-    mensagemReferencia: '',
-    pagamentos: [],
+document.addEventListener('alpine:init', () => {
+  Alpine.data('labClaudio', () => ({
+    apiKey: '',
+    referenceId: '',
+    referenceAmount: '',
+    referenceInvoice: '',
+    referenceExpiry: '',
+    createdReferenceId: '',
+    payments: [],
+    paymentAckId: '',
+    result: '',
+    error: '',
     
-    gerarReferenciaId() {
-      this.referenciaId = Math.floor(Math.random() * 1e9).toString();
-      this.novaReferencia.id = this.referenciaId;
-    },
-    
-    async criarReferencia() {
-      if (!this.token) {
-        alert("Insira o token primeiro.");
-        return;
-      }
+    async generateReferenceId() {
+      this.clearStatus()
       try {
-        const res = await fetch('https://api.proxypay.co.ao/rps/v2/references', {
+        const response = await fetch('https://api.proxypay.co.ao/reference_ids', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Token ${this.token}`
-          },
-          body: JSON.stringify(this.novaReferencia)
+          headers: this.getHeaders()
         });
         
-        if (!res.ok) throw new Error(await res.text());
+        if (!response.ok) throw await response.text();
         
-        const data = await res.json();
-        this.mensagemReferencia = `✅ Referência ${data.id} criada com sucesso!`;
+        const id = await response.text(); // it's returned as plain text, not JSON
+        this.referenceId = id;
+        this.createdReferenceId = id;
+        this.result = 'Referência gerada com sucesso!';
       } catch (err) {
-        this.mensagemReferencia = `Erro: ${err.message}`;
+        this.error = 'Erro ao gerar referência: ' + err;
       }
     },
     
-    async verPagamentos() {
-      if (!this.token) {
-        alert("Insira o token primeiro.");
-        return;
-      }
+    async createOrUpdateReference() {
+      this.clearStatus()
       try {
-        const res = await fetch('https://api.proxypay.co.ao/rps/v2/payments', {
-          headers: {
-            'Authorization': `Token ${this.token}`
+        const payload = {
+          amount: this.referenceAmount,
+          end_datetime: this.referenceExpiry,
+          custom_fields: {
+            invoice: this.referenceInvoice
           }
+        };
+        
+        const response = await fetch(`https://api.proxypay.co.ao/references/${this.referenceId}`, {
+          method: 'PUT',
+          headers: this.getHeaders(),
+          body: JSON.stringify(payload)
         });
         
-        if (!res.ok) throw new Error(await res.text());
-        
-        this.pagamentos = await res.json();
+        if (response.status === 204) {
+          this.result = 'Referência criada/atualizada com sucesso!';
+        } else {
+          const errorData = await response.json();
+          throw JSON.stringify(errorData);
+        }
       } catch (err) {
-        alert(`Erro ao buscar pagamentos: ${err.message}`);
+        this.error = 'Erro ao criar/atualizar referência: ' + err;
       }
+    },
+    
+    async getPayments() {
+      this.clearStatus()
+      try {
+        const response = await fetch('https://api.proxypay.co.ao/payments?n=100', {
+          method: 'GET',
+          headers: this.getHeaders()
+        });
+        
+        if (!response.ok) throw await response.text();
+        
+        const payments = await response.json();
+        this.payments = payments;
+        this.result = `Carregados ${payments.length} pagamentos pendentes.`;
+      } catch (err) {
+        this.error = 'Erro ao obter pagamentos: ' + err;
+      }
+    },
+    
+    async acknowledgePayment(id) {
+      this.clearStatus()
+      try {
+        const response = await fetch(`https://api.proxypay.co.ao/payments/${id}`, {
+          method: 'DELETE',
+          headers: this.getHeaders()
+        });
+        
+        if (response.status === 204) {
+          this.result = `Pagamento ${id} reconhecido com sucesso.`;
+          this.getPayments();
+        } else {
+          const errorData = await response.json();
+          throw JSON.stringify(errorData);
+        }
+      } catch (err) {
+        this.error = 'Erro ao reconhecer pagamento: ' + err;
+      }
+    },
+    
+    getHeaders() {
+      return {
+        'Authorization': 'Token ' + this.apiKey,
+        'Accept': 'application/vnd.proxypay.v2+json',
+        'Content-Type': 'application/json'
+      };
+    },
+    
+    clearStatus() {
+      this.result = '';
+      this.error = '';
     }
-  };
-}
+  }));
+});
