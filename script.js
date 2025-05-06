@@ -1,5 +1,4 @@
 const elements = {
-  apiKey: document.getElementById('apiKey'),
   amount: document.getElementById('amount'),
   quantity: document.getElementById('quantity'),
   invoice: document.getElementById('invoice'),
@@ -8,74 +7,54 @@ const elements = {
   status: document.getElementById('status'),
   resultBox: document.getElementById('referenceBox'),
   referenceText: document.getElementById('referenceText'),
-  loader: document.getElementById('loader'),
+  loader: document.getElementById('loader')
 };
 
 elements.generateBtn.addEventListener('click', async () => {
   clearStatus();
-  toggleLoader(true);
-  
-  const apiKey = elements.apiKey.value.trim();
-  if (!apiKey) {
-    showStatus('Por favor, insira sua chave da API.', false);
-    toggleLoader(false);
-    return;
-  }
+  showLoader(true);
   
   try {
-    // 1. Gerar ID dey Referência
-    const refIdRes = await fetch('https://api.proxypay.co.ao/reference_ids', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Token ${apiKey}`,
-        'Accept': 'application/vnd.proxypay.v2+json'
-      }
-    });
-    
+    // 1. Generate Reference ID
+    const refIdRes = await fetch('https://proxypay-api.vercel.app/api/reference');
     if (!refIdRes.ok) throw await refIdRes.text();
-    const referenceId = await refIdRes.text();
+    const refData = await refIdRes.json();
+    const referenceId = refData.id;
     
-    // 2. Construir payload da Referência
-    const amount = parseInt(elements.amount.value);
-    const quantity = parseInt(elements.quantity.value);
-    const totalAmount = amount * quantity;
-    
+    // 2. Build Reference payload
     const payload = {
-      amount: totalAmount,
+      amount: parseInt(elements.amount.value) * parseInt(elements.quantity.value),
       end_datetime: elements.expiry.value,
       custom_fields: {
         invoice: elements.invoice.value
       }
     };
     
-    // 3. Enviar Referência
-    const refRes = await fetch(`https://api.proxypay.co.ao/references/${referenceId}`, {
+    // 3. Send Reference
+    const refRes = await fetch(`https://proxypay-api.vercel.app/api/reference?reference_id=${referenceId}`, {
       method: 'PUT',
-      headers: {
-        'Authorization': `Token ${apiKey}`,
-        'Accept': 'application/vnd.proxypay.v2+json',
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
     
     if (refRes.status === 204) {
-      showStatus('✅ Referência criada com sucesso. Clique abaixo para copiar.', true);
+      showStatus('Referência criada com sucesso!', true);
       showReference(referenceId);
     } else {
       const errData = await refRes.json();
       throw JSON.stringify(errData);
     }
   } catch (err) {
-    showStatus('❌ Erro: ' + err, false);
+    showStatus('Erro: ' + err, false);
   } finally {
-    toggleLoader(false);
+    showLoader(false);
   }
 });
 
 function clearStatus() {
   elements.status.innerText = '';
   elements.resultBox.style.display = 'none';
+  elements.referenceText.innerText = '';
 }
 
 function showStatus(message, success = true) {
@@ -88,10 +67,10 @@ function showReference(refId) {
   elements.referenceText.innerText = refId;
   elements.referenceText.onclick = () => {
     navigator.clipboard.writeText(refId);
-    showStatus('📋 Copiado para a área de transferência!', true);
+    showStatus('Copiado para a área de transferência!', true);
   };
 }
 
-function toggleLoader(show) {
-  elements.loader.style.display = show ? 'block' : 'none';
+function showLoader(visible) {
+  elements.loader.style.display = visible ? 'inline-block' : 'none';
 }

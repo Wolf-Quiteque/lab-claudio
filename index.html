@@ -3,113 +3,147 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lab Claudio – ProxyPay</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <title>Lab Claudio</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f4f4f4;
+      background: #f2f4f8;
       margin: 0;
       padding: 0;
+      color: #333;
+      overflow-y: scroll;
     }
+
     header {
-      background: #0077b6;
+      background-color: #4f46e5;
       color: white;
       padding: 1rem;
       text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
     }
+
     main {
-      padding: 1rem;
+      padding: 2rem;
       max-width: 600px;
       margin: auto;
     }
+
     .card {
       background: white;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
     }
+
     label {
       display: block;
       margin-top: 1rem;
-      font-weight: bold;
+      font-weight: 600;
     }
-    input, select {
+
+    input {
       width: 100%;
       padding: 0.5rem;
       margin-top: 0.25rem;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 8px;
     }
+
     button {
-      background: #0077b6;
+      background-color: #4f46e5;
       color: white;
-      padding: 0.75rem;
       border: none;
-      border-radius: 4px;
-      margin-top: 1rem;
-      width: 100%;
-      font-size: 1rem;
+      padding: 0.75rem 1.5rem;
+      margin-top: 1.5rem;
+      border-radius: 8px;
       cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
+
     button:hover {
-      background: #005f87;
+      background-color: #4338ca;
     }
+
     .status {
       margin-top: 1rem;
       font-weight: bold;
     }
-    .reference-box {
+
+    #referenceBox {
       display: none;
       margin-top: 1rem;
-      background: #e0f7fa;
+      background-color: #e0f2fe;
+      border: 1px dashed #0284c7;
       padding: 1rem;
-      border-radius: 4px;
+      border-radius: 8px;
       text-align: center;
       cursor: pointer;
     }
-    .reference-box:hover {
-      background: #b2ebf2;
+
+    #loader {
+      display: none;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4f46e5;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin-left: 1rem;
     }
-    .icon {
-      margin-right: 0.5rem;
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.9rem;
+      color: #666;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1><i class="fas fa-flask icon"></i>Lab Claudio – ProxyPay</h1>
-  </header>
+  <header>Lab Claudio</header>
   <main>
     <div class="card">
-      <label for="apiKey">🔑 Chave da API</label>
-      <input type="password" id="apiKey" placeholder="Insira sua chave da API" />
+      <h2>Criar Referência</h2>
+      <label for="amount">Valor por unidade (em centavos):</label>
+      <input type="number" id="amount" placeholder="Ex: 5000" />
 
-      <label for="amount">💰 Valor Unitário (AOA)</label>
-      <input type="number" id="amount" placeholder="Ex: 1000" />
+      <label for="quantity">Quantidade:</label>
+      <input type="number" id="quantity" value="1" />
 
-      <label for="quantity">🔢 Quantidade</label>
-      <input type="number" id="quantity" placeholder="Ex: 2" />
+      <label for="invoice">Número da Fatura (opcional):</label>
+      <input type="text" id="invoice" placeholder="Ex: FAT123456" />
 
-      <label for="invoice">🧾 Nº da Fatura</label>
-      <input type="text" id="invoice" placeholder="Ex: F12345" />
-
-      <label for="expiry">📅 Data de Expiração</label>
+      <label for="expiry">Data de expiração:</label>
       <input type="datetime-local" id="expiry" />
-<div id="loader" style="display:none; text-align:center; margin-top:1rem;">
-  <i class="fas fa-spinner fa-spin fa-2x" style="color:#0077b6;"></i>
-  <p>Processando...</p>
-</div>
-      <button id="generate"><i class="fas fa-cogs icon"></i>Gerar Referência</button>
+
+      <button id="generate">
+        Criar Referência
+        <div id="loader"></div>
+      </button>
 
       <div class="status" id="status"></div>
-      <div class="reference-box" id="referenceBox">
-        <span id="referenceText"></span>
-        <p><small>Clique para copiar</small></p>
+
+      <div id="referenceBox">
+        Referência: <strong id="referenceText"></strong><br/>
+        <small>(Clique para copiar)</small>
       </div>
     </div>
   </main>
+
+  <footer>
+    Desenvolvido com carinho por Lab Claudio.
+  </footer>
+
   <script src="script.js"></script>
 </body>
 </html>
