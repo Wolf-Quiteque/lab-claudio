@@ -3,57 +3,110 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lab Claudio</title>
-  <link rel="stylesheet" href="style.css" />
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <script defer src="script.js"></script>
+  <title>Lab Claudio – ProxyPay</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #0077b6;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    main {
+      padding: 1rem;
+      max-width: 600px;
+      margin: auto;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background: #0077b6;
+      color: white;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 4px;
+      margin-top: 1rem;
+      width: 100%;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #005f87;
+    }
+    .status {
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    .reference-box {
+      display: none;
+      margin-top: 1rem;
+      background: #e0f7fa;
+      padding: 1rem;
+      border-radius: 4px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .reference-box:hover {
+      background: #b2ebf2;
+    }
+    .icon {
+      margin-right: 0.5rem;
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 min-h-screen text-white font-sans">
-
-  <header class="p-6 bg-white bg-opacity-20 shadow-md text-center text-3xl font-bold">
-    💳 Lab Claudio - Multicaixa Interativo
+<body>
+  <header>
+    <h1><i class="fas fa-flask icon"></i>Lab Claudio – ProxyPay</h1>
   </header>
+  <main>
+    <div class="card">
+      <label for="apiKey">🔑 Chave da API</label>
+      <input type="password" id="apiKey" placeholder="Insira sua chave da API" />
 
-  <main class="p-6 space-y-6" x-data="labClaudioApp()">
-    <section class="bg-white bg-opacity-10 p-6 rounded-lg shadow-md">
-    
-      <h2 class="text-xl mb-4 font-semibold">🔐 Token de Acesso</h2>
-      <input x-model="token" class="input" placeholder="Cole seu Token aqui" />
-    </section>
+      <label for="amount">💰 Valor Unitário (AOA)</label>
+      <input type="number" id="amount" placeholder="Ex: 1000" />
 
-    <section class="bg-white bg-opacity-10 p-6 rounded-lg shadow-md">
-      <h2 class="text-xl mb-4 font-semibold">🎯 Gerar ID de Referência</h2>
-      <button @click="gerarReferenciaId" class="botao">Gerar</button>
-      <p x-show="referenciaId" class="mensagem-sucesso mt-4">ID Gerado: <strong x-text="referenciaId"></strong></p>
-    </section>
+      <label for="quantity">🔢 Quantidade</label>
+      <input type="number" id="quantity" placeholder="Ex: 2" />
 
-    <section class="bg-white bg-opacity-10 p-6 rounded-lg shadow-md">
-      <h2 class="text-xl mb-4 font-semibold">📌 Criar Referência</h2>
-      <input x-model="novaReferencia.id" class="input" placeholder="ID da Referência" />
-      <input x-model="novaReferencia.amount" class="input" placeholder="Valor (ex: 1000.00)" />
-      <input x-model="novaReferencia.end_datetime" class="input" placeholder="Data de Expiração (ex: 2025-12-31)" />
-      <input x-model="novaReferencia.invoice" class="input" placeholder="Número da Fatura" />
-      <button @click="criarReferencia" class="botao">Criar</button>
-      <p x-show="mensagemReferencia" class="mensagem-sucesso mt-4" x-text="mensagemReferencia"></p>
-    </section>
+      <label for="invoice">🧾 Nº da Fatura</label>
+      <input type="text" id="invoice" placeholder="Ex: F12345" />
 
-    <section class="bg-white bg-opacity-10 p-6 rounded-lg shadow-md">
-      <h2 class="text-xl mb-4 font-semibold">🧾 Ver Pagamentos</h2>
-      <button @click="verPagamentos" class="botao">Ver Pagamentos</button>
-      <ul class="mt-4 space-y-2" x-show="pagamentos.length">
-        <template x-for="p in pagamentos" :key="p.id">
-          <li class="bg-white bg-opacity-20 p-3 rounded">
-            Referência: <strong x-text="p.reference_id"></strong> |
-            Valor: <strong x-text="p.amount"></strong> |
-            Data: <strong x-text="p.datetime"></strong>
-          </li>
-        </template>
-      </ul>
-    </section>
+      <label for="expiry">📅 Data de Expiração</label>
+      <input type="datetime-local" id="expiry" />
+
+      <button id="generate"><i class="fas fa-cogs icon"></i>Gerar Referência</button>
+
+      <div class="status" id="status"></div>
+      <div class="reference-box" id="referenceBox">
+        <span id="referenceText"></span>
+        <p><small>Clique para copiar</small></p>
+      </div>
+    </div>
   </main>
-
-  <footer class="text-center p-4 bg-white bg-opacity-20 mt-10">
-    Desenvolvido com ❤️ por Lab Claudio
-  </footer>
+  <script src="script.js"></script>
 </body>
 </html>
