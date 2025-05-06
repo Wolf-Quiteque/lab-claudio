@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lab Claudio</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script defer src="script.js"></script>
+</head>
+<body class="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 min-h-screen text-white font-sans">
+
+  <header class="p-6 bg-white bg-opacity-20 shadow-md text-center text-3xl font-bold">
+    💳 Lab Claudio - Multicaixa Interativo
+  </header>
+
+  <main class="p-6 space-y-6" x-data="labClaudioApp()">
+    <section class="bg-white bg-opacity-10 p-6 rounded-lg shadow-md">
+      <h2 class="text-xl mb-4 font-semibold">🎯 Gerar ID de Referência</h2>
+      <button @click="gerarReferenciaId" class="botao">Gerar</button>
+      <p x-show="referenciaId" class="mensagem-sucesso mt-4">ID Gerado: <strong x-text="referenciaId"></strong></p>
+    </section>
+
+    <section class="bg-white bg-opacity-10 p-6 rounded-lg shadow-md">
+      <h2 class="text-xl mb-4 font-semibold">📌 Criar Referência</h2>
+      <input x-model="novaReferencia.id" class="input" placeholder="ID da Referência" />
+      <input x-model="novaReferencia.amount" class="input" placeholder="Valor (ex: 1000.00)" />
+      <input x-model="novaReferencia.end_datetime" class="input" placeholder="Data de Expiração (ex: 2025-12-31)" />
+      <input x-model="novaReferencia.invoice" class="input" placeholder="Número da Fatura" />
+      <button @click="criarReferencia" class="botao">Criar</button>
+      <p x-show="mensagemReferencia" class="mensagem-sucesso mt-4" x-text="mensagemReferencia"></p>
+    </section>
+
+    <section class="bg-white bg-opacity-10 p-6 rounded-lg shadow-md">
+      <h2 class="text-xl mb-4 font-semibold">🧾 Ver Pagamentos</h2>
+      <button @click="verPagamentos" class="botao">Ver Pagamentos</button>
+      <ul class="mt-4 space-y-2" x-show="pagamentos.length">
+        <template x-for="p in pagamentos" :key="p.id">
+          <li class="bg-white bg-opacity-20 p-3 rounded">
+            Referência: <strong x-text="p.reference_id"></strong> |
+            Valor: <strong x-text="p.amount"></strong> |
+            Data: <strong x-text="p.datetime"></strong>
+          </li>
+        </template>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="text-center p-4 bg-white bg-opacity-20 mt-10">
+    Desenvolvido com ❤️ por Lab Claudio
+  </footer>
+</body>
+</html>
