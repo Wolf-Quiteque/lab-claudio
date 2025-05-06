@@ -16,7 +16,8 @@ elements.generateBtn.addEventListener('click', async () => {
   
   try {
     // 1. Generate Reference ID
-    const refIdRes = await fetch('https://proxypay-api.vercel.app/api/reference');
+    const refIdRes = await fetch('https://proxypay-api.vercel.app/api/references',{method: "POST"});
+    
     if (!refIdRes.ok) throw await refIdRes.text();
     const refData = await refIdRes.json();
     const referenceId = refData.id;
@@ -31,7 +32,7 @@ elements.generateBtn.addEventListener('click', async () => {
     };
     
     // 3. Send Reference
-    const refRes = await fetch(`https://proxypay-api.vercel.app/api/reference?reference_id=${referenceId}`, {
+    const refRes = await fetch(`https://proxypay-api.vercel.app/api/references?reference_id=${referenceId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
