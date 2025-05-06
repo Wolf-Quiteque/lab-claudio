@@ -23,7 +23,7 @@ elements.generateBtn.addEventListener('click', async () => {
   }
   
   try {
-    // 1. Gerar ID de Referência
+    // 1. Gerar ID dey Referência
     const refIdRes = await fetch('https://api.proxypay.co.ao/reference_ids', {
       method: 'POST',
       headers: {
