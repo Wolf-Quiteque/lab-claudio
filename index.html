@@ -97,7 +97,10 @@
 
       <label for="expiry">📅 Data de Expiração</label>
       <input type="datetime-local" id="expiry" />
-
+<div id="loader" style="display:none; text-align:center; margin-top:1rem;">
+  <i class="fas fa-spinner fa-spin fa-2x" style="color:#0077b6;"></i>
+  <p>Processando...</p>
+</div>
       <button id="generate"><i class="fas fa-cogs icon"></i>Gerar Referência</button>
 
       <div class="status" id="status"></div>

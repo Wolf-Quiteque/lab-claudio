@@ -8,14 +8,17 @@ const elements = {
   status: document.getElementById('status'),
   resultBox: document.getElementById('referenceBox'),
   referenceText: document.getElementById('referenceText'),
+  loader: document.getElementById('loader'),
 };
 
 elements.generateBtn.addEventListener('click', async () => {
   clearStatus();
+  toggleLoader(true);
   
   const apiKey = elements.apiKey.value.trim();
   if (!apiKey) {
     showStatus('Por favor, insira sua chave da API.', false);
+    toggleLoader(false);
     return;
   }
   
@@ -57,7 +60,7 @@ elements.generateBtn.addEventListener('click', async () => {
     });
     
     if (refRes.status === 204) {
-      showStatus('✅ Referência criada com sucesso.', true);
+      showStatus('✅ Referência criada com sucesso. Clique abaixo para copiar.', true);
       showReference(referenceId);
     } else {
       const errData = await refRes.json();
@@ -65,6 +68,8 @@ elements.generateBtn.addEventListener('click', async () => {
     }
   } catch (err) {
     showStatus('❌ Erro: ' + err, false);
+  } finally {
+    toggleLoader(false);
   }
 });
 
@@ -85,4 +90,8 @@ function showReference(refId) {
     navigator.clipboard.writeText(refId);
     showStatus('📋 Copiado para a área de transferência!', true);
   };
+}
+
+function toggleLoader(show) {
+  elements.loader.style.display = show ? 'block' : 'none';
 }
